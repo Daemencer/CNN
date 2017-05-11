@@ -1,59 +1,29 @@
 #pragma once
 
-#include <cstdlib>
-#include <cmath>
 #include <vector>
+#include <cmath>
 
-#include "NeuralNet.h"
-
-namespace FacialRecognition
-{
-
-struct Connection
-{
-	double weight;
-	double deltaWeight;
-};
+#include "Connection.h"
 
 class Neuron
 {
 public:
-	Neuron(unsigned int outputCount, unsigned int p_layerIndex);
+	Neuron();
+	~Neuron();
 
-	auto feedForward(const Layer& previousLayer) -> void;
+	static	auto	SIGMOID(double x) -> double { return tanh(x); }
+	static	auto	DSIGMOID(double x) -> double { return 1.0 - x * x;
+	}
 
-	auto calculateOutputGradients(double targetVal) -> void;
+	auto	AddConnection(Connection* connection) -> void;
 
-	auto calculateHiddenGradients(const Layer& nextLayer) -> void;
+	auto	GetOutput() const -> double { return m_output; }
+	auto	SetOutput(double output) -> void { m_output = output; }
 
-	auto updateInputWeights(Layer& previousLayer) -> void;
-
-	auto getOutputValue() const -> double { return m_outputValue; }
-	auto setOutputValue(double value) -> void { m_outputValue = value; }
-
-	auto getGradient() const -> double { return m_gradient; }
-
-	auto getConnections() const -> const std::vector<Connection>& { return m_connections; }
+	auto	GetConnections() const -> const std::vector<Connection*>& { return m_connections; }
 
 private:
-	static auto activationFunction(double x) -> double { return tanh(x); }
-	static auto activationFunctionDerivative(double x) -> double { return 1.0 - x * x;}
+	double m_output;
 
-	static auto randomWeight() -> double { return rand() / double(RAND_MAX); }
-
-
-	static double eta;
-	static double alpha;
-
-
-	auto sumDOW(const Layer& nextLayer) const -> double;
-
-
-	unsigned int m_layerIndex;
-	std::vector<Connection> m_connections;
-
-	double m_outputValue = 0;
-	double m_gradient = 0;
+	std::vector<Connection*> m_connections;
 };
-
-}

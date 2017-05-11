@@ -1,42 +1,27 @@
 #pragma once
 
-#include <fstream>
 #include <vector>
 
-namespace FacialRecognition
-{
-
-class Neuron;
-class TrainingData;
-
-typedef std::vector<Neuron> Layer;
+class Layer;
 
 class NeuralNet
 {
 public:
-	NeuralNet(const std::vector<unsigned int>& topology);
-	~NeuralNet();
+	NeuralNet() = default;
+	~NeuralNet() = default;
 
-	auto train(const TrainingData& trainingData, unsigned int iterations) -> void;
+	auto	FeedForward(std::vector<double> inputs, unsigned int inCount, double* outputs, unsigned int outCount) -> void;
 
-	auto feedForward(const std::vector<double>& inputVals) -> void;
-
-	auto backProp(const std::vector<double>& targetVals) -> void;
-	
-	auto getResults(std::vector<double>& resultVals) const -> void;
-
-	auto getRecentAverageError() const -> double { return m_recentAverageError; }
+	auto	BackPropagation(std::vector<double>& targetValues) -> void;
 
 private:
-	std::vector<Layer> m_layers;
 	double m_error;
+	double m_recentAverageError;
+	double m_recentAverageSmoothingFactor;
 
-	double m_recentAverageError = 0;
-	double m_recentAverageSmoothingFactor = 0;
+	double m_gradient;
 
-	// tmp debug
-	std::ofstream file;
-	std::ofstream ostream;
+	double m_etaLearningRate;
+
+	std::vector<Layer*> m_layers;
 };
-
-}
