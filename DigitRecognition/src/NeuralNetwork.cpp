@@ -27,7 +27,14 @@ auto	NeuralNetwork::initialize(Topology& topology) -> void
 	// create all the layers
 	for (unsigned int i = 0; i < topology.m_layers.size(); ++i)
 	{
-		Layer* layer = new Layer(topology.m_layers[i]);
+		// this part will later no longer be needed using topology file
+		ELayerType layerType = ELayerType::INPUT;
+
+		if (i == 0) layerType = ELayerType::INPUT;
+		else if (i == topology.m_layers.size() - 1) layerType = ELayerType::OUTPUT;
+		else layerType = ELayerType::HIDDEN;
+
+		Layer* layer = new Layer(topology.m_layers[i], layerType);
 		layer->m_connections = &m_connections;
 		m_layers.push_back(layer);
 	}
@@ -79,9 +86,24 @@ auto	NeuralNetwork::feedForward(MNISTNumber sample) -> void
 }
 
 
-auto	NeuralNetwork::backPropagation(std::vector<float>& targetVals) -> void
+auto	NeuralNetwork::backPropagation(const MNISTNumber& sample) -> void
 {
+	// check that there are as many target vals as there are neurons in the output layer
 
+	// calculate gradients for all neurons starting at the last layer
+	for (unsigned int i = m_layers.size() - 1; i > 0; --i)
+	{
+		m_layers[i]->calcGradients(sample.output.data());
+	}
+
+	// now adjut the weights
+	for (unsigned int i = m_layers.size() - 1; i > 0; --i)
+	{
+		m_layers[i]->updateWeights(m_eta, m_alpha);
+	}
+
+	// could parametrize that
+	adjustEta();
 }
 
 
@@ -109,4 +131,24 @@ auto	NeuralNetwork::calculateOverallNetError(const std::vector<float>& targetVal
 	m_recentAverageError = (m_recentAverageError * m_recentAverageSmoothingFactor + m_error) / (m_recentAverageSmoothingFactor + 1.0f);
 
 
+}
+
+
+auto	NeuralNetwork::adjustEta() -> float
+{
+	const float thresholdUp = 0.001f;       // Ignore error increases less than this magnitude
+	const float thresholdDown = 0.01f;      // Ignore error decreases less than this magnitude
+	const float factorUp = 1.005f;          // Factor to incrementally increase eta
+	const float factorDown = 0.999f;        // Factor to incrementally decrease eta
+
+	float errorGradient = (m_recentAverageError - m_lastRecentAverageError) / m_recentAverageError;
+
+	if (errorGradient > thresholdUp) {
+		m_eta *= factorDown;
+	}
+	else if (errorGradient < -thresholdDown) {
+		m_eta *= factorUp;
+	}
+
+	return m_eta;
 }

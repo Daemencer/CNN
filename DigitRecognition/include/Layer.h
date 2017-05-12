@@ -5,14 +5,22 @@
 #include "Neuron.h"
 #include "Connection.h"
 
+enum ELayerType
+{
+	INPUT = 0,
+	HIDDEN,
+	OUTPUT
+};
+
 class Layer
 {
 public:
-	Layer(unsigned int neuronCount); // TODO: add a topology at some point
+	Layer(unsigned int neuronCount, ELayerType type); // TODO: add a topology at some point
 	~Layer();
 
 	auto	feedForward() -> void;
 	auto	backPropagation(std::vector<float>& targetVals) -> void;
+	auto	calcGradients(const float* targetVals) -> void;
 	auto	updateWeights(float eta, float alpha) -> void;
 
 
@@ -29,6 +37,8 @@ public:
 	// not sure I'll keep this shit
 	std::vector<Connection>*	m_connections;
 	unsigned int				m_backConnectionsCount;
+
+	ELayerType m_layerType;
 
 private:
 	// these 3 could be grouped into a struct

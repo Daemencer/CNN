@@ -8,16 +8,15 @@
 int main(int ac, char** av)
 {
 	// read the input file for training data
-	MNISTDataReader reader("resources/dataset/train.csv");
+	MNISTDataReader reader("resources/dataset/train_full.csv");
 	reader.GenerateData();
 
 	//// open an output stream to the weights
 
 	//// using topology file
 	Topology topology;
-	topology.m_layers.push_back(3);
-	topology.m_layers.push_back(20);
-	topology.m_layers.push_back(20);
+	topology.m_layers.push_back(784);
+	topology.m_layers.push_back(1000);
 	topology.m_layers.push_back(10);
 
 	// create a neural net
@@ -41,11 +40,9 @@ int main(int ac, char** av)
 		net.feedForward(sample);
 
 		// backprop the net to calculate net error
-		//net.backProp();
+		net.backPropagation(sample);
 
-		// adjust gradients
-
-		if (++epochCount > 5000) train = false;
+		if (++epochCount > 100000) train = false;
 	}
 
 	//// save weights

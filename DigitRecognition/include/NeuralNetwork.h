@@ -21,12 +21,12 @@ public:
 
 	//auto	feedForward(std::vector<float>& inputVals) -> void;
 	auto	feedForward(MNISTNumber sample) -> void;	// temporary
-	auto	backPropagation(std::vector<float>& targetVals) -> void;
-
 	//auto	backProp(std::vector<float>& outputVals) -> void;	// temporary
-	auto	backProp(MNISTNumber sample) -> void;	// temporary
+	auto	backPropagation(const MNISTNumber& sample) -> void;	// temporary
 
 	auto	calculateOverallNetError(const std::vector<float>& targetVals) -> void;
+
+	auto	adjustEta() -> float;
 
 	Neuron	m_bias;
 

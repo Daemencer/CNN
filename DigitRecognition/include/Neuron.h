@@ -17,6 +17,8 @@ public:
 	auto	calcOutputGradients(float targetVal) -> void;
 	auto	calcHiddenGradients(Layer& layer) -> void;
 
+	auto	sumDOW(std::vector<Connection>* connections) -> float;
+
 	auto	transferFunctionTanh(float x) -> float { return tanh(x); }
 	auto	transferFunctionDerivativeTanh(float x) -> float { return 1.0f - tanh(x) * tanh(x); }
 
