@@ -2,11 +2,13 @@
 
 #include "Connection.h"
 
-Layer::Layer(unsigned int neuronCount)
+Layer::Layer(unsigned int neuronCount, ELayerType type)
 {
 	m_depth = 0.0f;
 	m_x = 0.0f;
 	m_y = 0.0f;
+
+	m_layerType = type;
 
 	m_backConnectionsCount = 0.0f;
 
@@ -42,9 +44,31 @@ auto	Layer::backPropagation(std::vector<float>& targetVals) -> void
 }
 
 
+auto	Layer::calcGradients(const float* targetVals) -> void
+{
+	if (m_layerType == ELayerType::OUTPUT)
+	{
+		for (unsigned int i = 0; i < m_neurons.size(); ++i)
+		{
+			m_neurons[i].calcOutputGradients(targetVals[i]);
+		}
+	}
+	else if (m_layerType == ELayerType::HIDDEN)
+	{
+		for (unsigned int i = 0; i < m_neurons.size(); ++i)
+		{
+			m_neurons[i].calcHiddenGradients(*this);
+		}
+	}
+}
+
+
 auto	Layer::updateWeights(float eta, float alpha) -> void
 {
-
+	for (unsigned int i = 0; i < m_neurons.size(); ++i)
+	{
+		m_neurons[i].updateInputWeights(eta, alpha, m_connections);
+	}
 }
 
 
